@@ -1,4 +1,0 @@
-furiusisomount usr/bin
-debian/furiusisomount.xpm usr/share/pixmaps
-debian/furiusisomount.desktop usr/share/applications
-locale/* usr/share/locale
