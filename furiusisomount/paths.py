@@ -13,8 +13,11 @@ older versions keeps working:
 from __future__ import annotations
 
 import configparser
+import glob
 import os
 from dataclasses import dataclass, field
+
+from .app_info import APP_NAME
 
 
 @dataclass
@@ -72,11 +75,23 @@ def resource_path(*parts: str) -> str:
 
 
 def icon_path() -> str:
-    """Path of the application icon (PNG), used by the about dialog and window."""
-    for candidate in (
+    """Path of the application icon (PNG), used by the about dialog and window.
+
+    Lookup order: the project tree (git checkout), the private data directory
+    used by the Debian package, and the standard hicolor/pixmap locations.
+    """
+    candidates = [
         resource_path("resources", "icons", "furiusisomount.png"),
         resource_path("resources", "icons", "furiusisomount.svg"),
-    ):
-        if os.path.exists(candidate):
+        "/usr/share/%s/icons/furiusisomount.png" % APP_NAME,
+    ]
+    # hicolor icon theme: /usr/share/icons/hicolor/<size>/apps/<name>.png
+    candidates += sorted(glob.glob("/usr/share/icons/hicolor/*/apps/furiusisomount.png"))
+    candidates += [
+        "/usr/share/pixmaps/furiusisomount.png",
+        "/usr/local/share/pixmaps/furiusisomount.png",
+    ]
+    for candidate in candidates:
+        if candidate and os.path.exists(candidate):
             return candidate
     return ""

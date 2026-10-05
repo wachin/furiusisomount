@@ -46,17 +46,22 @@ def translation_dirs() -> list[str]:
 def _load_app_translator(app: QApplication, locale: QLocale) -> bool:
     """Try to load furiusisomount_<locale>.qm from every known directory."""
     name = QLocale(locale).name()  # e.g. "es_ES"
+    if name in ("C", "POSIX"):
+        # The source language is English: nothing to load
+        return False
     languages = [name]
     if "_" in name:
         languages.append(name.split("_")[0])
 
     for directory in translation_dirs():
         for language in languages:
-            for candidate in (
-                os.path.join(directory, "%s_%s.qm" % (APP_NAME, language)),
-                # Fallback for hand renamed files
-                *glob.glob(os.path.join(directory, "*%s*.qm" % language)),
-            ):
+            # Canonical name first, then other prefixes with the same language.
+            # Patterns are anchored to "_<language>." so that a locale like "C"
+            # can never match a file such as furiusisomount_zh_CN.qm.
+            candidates = [os.path.join(directory, "%s_%s.qm" % (APP_NAME, language))]
+            candidates += sorted(glob.glob(os.path.join(directory, "*_%s.qm" % language)))
+            candidates += sorted(glob.glob(os.path.join(directory, "*_%s_*.qm" % language)))
+            for candidate in candidates:
                 translator = QTranslator()
                 if translator.load(candidate):
                     app.installTranslator(translator)

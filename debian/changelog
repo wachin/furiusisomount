@@ -1,0 +1,9 @@
+furiusisomount (0.11.3.1) unstable; urgency=medium
+
+  * Initial Debian release.
+  * Modular PyQt6 rewrite of Furius ISO Mount with a multi-language interface
+    (Qt Linguist): English, Spanish, French, Portuguese, German, Italian,
+    Japanese, Russian and Chinese Simplified.
+  * Add man page, AppStream metadata and an autopkgtest smoke test.
+
+ -- Washington Indacochea Delgado <linuxfrontier@proton.me>  Mon, 05 Oct 2026 22:10:00 +0800

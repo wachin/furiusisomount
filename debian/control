@@ -1,0 +1,43 @@
+Source: furiusisomount
+Section: utils
+Priority: optional
+Maintainer: Washington Indacochea Delgado <linuxfrontier@proton.me>
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-setuptools,
+               pybuild-plugin-pyproject
+Standards-Version: 4.7.4
+Rules-Requires-Root: no
+Homepage: https://github.com/wachin/furiusisomount
+Vcs-Browser: https://github.com/wachin/furiusisomount
+Vcs-Git: https://github.com/wachin/furiusisomount.git
+Testsuite: autopkgtest
+
+Package: furiusisomount
+Architecture: all
+Depends: ${misc:Depends},
+         ${python3:Depends},
+         python3-pyqt6,
+         fuseiso,
+         udisks2
+Recommends: bchunk,
+            brasero | wodim,
+            lsof,
+            xdg-utils
+Description: mount ISO, IMG, BIN, MDF and NRG disc images
+ Furius ISO Mount is a simple graphical application to mount disc images
+ without burning them to a physical disc.
+ .
+ It supports ISO, IMG, BIN, MDF and NRG images with two mounting methods
+ (FUSE through fuseiso and loop devices through udisks2) and includes extra
+ tools:
+ .
+  * MD5 and SHA1 checksum calculation with progress and cancellation.
+  * BIN/CUE to ISO conversion.
+  * Image burning with brasero or wodim.
+  * Multi-language interface: English, Spanish, French, Portuguese, German,
+    Italian, Japanese, Russian and Chinese.
+ .
+ This package contains the PyQt6 fork of the original Furius ISO Mount by
+ Dean Harris.

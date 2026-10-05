@@ -37,7 +37,9 @@ sudo dnf install python3-qt6 fuseiso bchunk udisks2 brasero lsof
 ## Ejecutar
 
 ```bash
-python3 main.py
+python3 main.py            # desde el repositorio
+furiusisomount             # si está instalado (paquete .deb / pip)
+furiusisomount --version   # versión del programa
 ```
 
 Idioma forzado (opcional):
@@ -69,10 +71,42 @@ furiusisomount/
 │       └── workers.py         # hilos de trabajo (checksum/conversión)
 ├── resources/icons/           # icono del programa
 ├── translations/              # archivos .ts / .qm de Qt Linguist
+├── debian/                    # empaquetado Debian (política + lintian)
 ├── scripts/update_translations.sh
-├── data/furiusisomount.desktop
+├── data/                      # .desktop, metainfo AppStream
 └── tests/test_core.py         # pruebas de la lógica (sin GUI)
 ```
+
+## Empaquetado Debian
+
+El directorio `debian/` permite construir un paquete que cumple la Política de
+Debian y pasa lintian sin errores:
+
+```bash
+# Construir el paquete binario y el paquete fuente
+apt install debhelper dh-python python3-all python3-setuptools \
+            pybuild-plugin-pyproject lintian
+
+dpkg-buildpackage -us -uc -b          # solo binario
+dpkg-buildpackage -us -uc -S          # fuente (formato 3.0 native)
+
+# Comprobar con lintian
+lintian ../furiusisomount_0.11.3.1_*.changes
+
+# Pruebas automáticas (autopkgtest)
+autopkgtest . -- null                 # o contra un entorno schroot/sbuild
+```
+
+Incluido en el empaquetado:
+
+- `debian/control` — dependencias, `Standards-Version: 4.7.4`, `Testsuite: autopkgtest`
+- `debian/copyright` — formato DEP-5 (GPL-3+)
+- `debian/rules` — `dh` con `pybuild` (buildsystem de Python)
+- `debian/furiusisomount.1` — página de manual
+- `data/furiusisomount.metainfo.xml` — metadatos AppStream
+- `data/furiusisomount.desktop` — acceso directo de escritorio
+- `debian/tests/` — smoke test de autopkgtest
+- icono en `hicolor/128x128`, traducciones `.qm` en `/usr/share/furiusisomount/`
 
 ## Multilenguaje (Qt Linguist)
 
@@ -123,10 +157,13 @@ sistema (o `FURIUSISOMOUNT_LANG`), junto a las traducciones estándar de Qt
 
 ## Instalación (opcional)
 
+Con el paquete `.deb` todo se instala solo. Manualmente:
+
 ```bash
 # Icono y acceso directo de escritorio
-sudo cp resources/icons/furiusisomount.png /usr/share/icons/hicolor/256x256/apps/
+sudo cp resources/icons/furiusisomount.png /usr/share/icons/hicolor/128x128/apps/
 sudo cp data/furiusisomount.desktop /usr/share/applications/
+sudo cp data/furiusisomount.metainfo.xml /usr/share/metainfo/
 # Traducciones compiladas
 sudo mkdir -p /usr/share/furiusisomount/translations
 sudo cp translations/*.qm /usr/share/furiusisomount/translations/
