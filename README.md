@@ -1,31 +1,29 @@
 # Furius ISO Mount
 
-Aplicación sencilla (PyQt6) para **montar imágenes de disco** (ISO, IMG, BIN, MDF y NRG)
-sin necesidad de grabarlas, con herramientas extra: checksum MD5/SHA1, grabación de
-imágenes y conversión **BIN/CUE → ISO**.
+A simple application (PyQt6) for **mounting disc images** (ISO, IMG, BIN, MDF, and NRG)
+without the need to burn them, featuring additional tools: MD5/SHA1 checksums,
+image burning, and **BIN/CUE → ISO** conversion.
 
 *A simple PyQt6 application to mount ISO/IMG/BIN/MDF/NRG disc images without burning
 them, with MD5/SHA1 checksums, image burning and BIN/CUE → ISO conversion.*
 
 ---
 
-## Acerca de
+## About
 
 | | |
 |---|---|
-| **Versión** | 0.11.3.1 |
-| **Autor original** | Dean Harris &lt;marcus_furius@hotmail.com&gt; |
-| **Fork PyQt6 y modular** | Washington Indacochea Delgado |
-| **Correo** | [linuxfrontier@proton.me](mailto:linuxfrontier@proton.me) |
-| **Sitio web** | <https://github.com/wachin/furiusisomount> |
-| **Licencia** | GPL v3 |
-| **Tecnologías** | Python 3, PyQt6, fuseiso, udisks2, bchunk, brasero/wodim |
+| **Version** | 0.11.3.1 |
+| **Original Author** | Dean Harris &lt;marcus_furius@hotmail.com&gt; |
+| **PyQt6 & Modular Fork** | Washington Indacochea Delgado |
+| **Email** | [linuxfrontier@proton.me](mailto:linuxfrontier@proton.me) |
+| **Website** | <https://github.com/wachin/furiusisomount> |
+| **License** | GPL v3 |
+| **Technologies** | Python 3, PyQt6, fuseiso, udisks2, bchunk, brasero/wodim |
 
-El proyecto original (<https://github.com/prachpub/furiusisomount>) fue abandonado hace
-años; este fork lo moderniza: **arquitectura modular**, **interfaz multilenguaje**
-(Qt Linguist), correcciones de bugs y un diálogo *Acerca de* renovado.
-
-## Requisitos
+The original project (<https://github.com/prachpub/furiusisomount>) was abandoned years
+ago; this fork modernizes it with: **modular architecture**, **multi-language interface**
+(Qt Linguist), bug fixes, and a revamped *About* dialog. ## Requirements
 
 ```bash
 # Debian / Ubuntu
@@ -34,141 +32,98 @@ sudo apt install python3-pyqt6 fuseiso bchunk udisks2 brasero lsof
 sudo dnf install python3-qt6 fuseiso bchunk udisks2 brasero lsof
 ```
 
-## Ejecutar
+## Running
 
 ```bash
-python3 main.py            # desde el repositorio
-furiusisomount             # si está instalado (paquete .deb / pip)
-furiusisomount --version   # versión del programa
+python3 main.py            # from the repository
+furiusisomount             # if installed (.deb package / pip)
+furiusisomount --version   # program version
 ```
 
-Idioma forzado (opcional):
+Forced language (optional):
 
 ```bash
 FURIUSISOMOUNT_LANG=es python3 main.py
 ```
 
-## Estructura del proyecto
+## Project structure
 
 ```
 furiusisomount/
-├── main.py                    # punto de entrada
-├── furiusisomount/            # paquete principal
-│   ├── app_info.py            # metadatos (versión, créditos, licencia)
-│   ├── paths.py               # rutas de configuración/recursos
-│   ├── i18n.py                # carga de traducciones (Qt Linguist)
-│   ├── core/                  # lógica independiente de la interfaz
-│   │   ├── mounts.py          # montar/desmontar (FUSE y loop/udisks2)
-│   │   ├── checksum.py        # MD5/SHA1 con progreso y cancelación
+├── main.py                    # entry point
+├── furiusisomount/            # main package
+│   ├── app_info.py            # metadata (version, credits, license)
+│   ├── paths.py               # configuration/resource paths
+│   ├── i18n.py                # translation loading (Qt Linguist)
+│   ├── core/                  # interface-independent logic
+│   │   ├── mounts.py          # mount/unmount (FUSE and loop/udisks2)
+│   │   ├── checksum.py        # MD5/SHA1 with progress and cancellation
 │   │   ├── converter.py       # BIN/CUE → ISO (bchunk)
-│   │   ├── burner.py          # grabación (brasero/wodim)
-│   │   └── history.py         # historial, lista de montajes y registro
-│   └── ui/                    # interfaz PyQt6
-│       ├── main_window.py     # ventana principal (pestañas + drag&drop)
-│       ├── mount_tab.py       # pestaña "Montar imagen"
-│       ├── convert_tab.py     # pestaña "Convertir BIN/CUE"
-│       ├── about_dialog.py    # diálogo "Acerca de"
-│       └── workers.py         # hilos de trabajo (checksum/conversión)
-├── resources/icons/           # icono del programa
-├── translations/              # archivos .ts / .qm de Qt Linguist
-├── debian/                    # empaquetado Debian (política + lintian)
+│   │   ├── burner.py          # burning (brasero/wodim)
+│   │   └── history.py         # history, mount list, and logging
+│   └── ui/                    # PyQt6 interface
+│       ├── main_window.py     # main window (tabs + drag & drop)
+│       ├── mount_tab.py       # "Mount image" tab
+│       ├── convert_tab.py     # "Convert BIN/CUE" tab
+│       ├── about_dialog.py    # "About" dialog
+│       └── workers.py         # worker threads
+``` (checksum/conversion)
+├── resources/icons/           # program icon
+├── translations/              # Qt Linguist .ts / .qm files
+├── debian/                    # Debian packaging (policy + lintian)
 ├── scripts/update_translations.sh
-├── data/                      # .desktop, metainfo AppStream
-└── tests/test_core.py         # pruebas de la lógica (sin GUI)
+├── data/                      # .desktop, AppStream metainfo
+└── tests/test_core.py         # logic tests (headless/no GUI)
 ```
 
-## Empaquetado Debian
+## Debian Packaging
 
-El directorio `debian/` permite construir un paquete que cumple la Política de
-Debian y pasa lintian sin errores:
+The `debian/` directory allows for building a package that complies with
+Debian Policy and passes lintian checks without errors:
 
 ```bash
-# Construir el paquete binario y el paquete fuente
+# Build the binary package and the source package
 apt install debhelper dh-python python3-all python3-setuptools \
-            pybuild-plugin-pyproject lintian
+pybuild-plugin-pyproject lintian
 
-dpkg-buildpackage -us -uc -b          # solo binario
-dpkg-buildpackage -us -uc -S          # fuente (formato 3.0 native)
+dpkg-buildpackage -us -uc -b          # binary only
+dpkg-buildpackage -us -uc -S          # source (3.0 native format)
 
-# Comprobar con lintian
+# Check with lintian
 lintian ../furiusisomount_0.11.3.1_*.changes
 
-# Pruebas automáticas (autopkgtest)
-autopkgtest . -- null                 # o contra un entorno schroot/sbuild
+# Automated tests (autopkgtest)
+autopkgtest . -- null                 # or against a schroot/sbuild environment
 ```
 
-Incluido en el empaquetado:
+Included in the packaging:
 
-- `debian/control` — dependencias, `Standards-Version: 4.7.4`, `Testsuite: autopkgtest`
-- `debian/copyright` — formato DEP-5 (GPL-3+)
-- `debian/rules` — `dh` con `pybuild` (buildsystem de Python)
-- `debian/furiusisomount.1` — página de manual
-- `data/furiusisomount.metainfo.xml` — metadatos AppStream
-- `data/furiusisomount.desktop` — acceso directo de escritorio
-- `debian/tests/` — smoke test de autopkgtest
-- icono en `hicolor/128x128`, traducciones `.qm` en `/usr/share/furiusisomount/`
+- `debian/control` — dependencies, `Standards-Version: 4.7.4`, `Testsuite: autopkgtest`
+- `debian/copyright` — DEP-5 format (GPL-3+)
+- `debian/rules` — `dh` with `pybuild` (Python build system)
+- `debian/furiusisomount.1` — man page
+- `data/furiusisomount.metainfo.xml` — AppStream metadata
+- `data/furiusisomount.desktop` — desktop shortcut
+- `debian/tests/` — autopkgtest smoke test
+- icon in `hicolor/128x128`, `.qm` translations in `/usr/share/furiusisomount/`
 
-## Multilenguaje (Qt Linguist)
+## Multilanguage (Qt Linguist)
 
-El idioma base es el **inglés**: todas las cadenas usan `self.tr("...")` y se extraen
-automáticamente.
+The base language is **English**: all strings use `self.tr("...")` and are extracted
+automatically.
 
 ```bash
-# 1. Extraer cadenas y crear/actualizar los .ts (por defecto: es y fr)
+# 1. Extract strings and create/update .ts files (default: es and fr)
 ./scripts/update_translations.sh
 LANGS="es fr pt de" ./scripts/update_translations.sh
 
-# 2. Traducir con Qt Linguist
+# 2. Translate using Qt Linguist
 linguist translations/furiusisomount_pt.ts
 
-# 3. Compilar a .qm (lo hace el script si encuentra lrelease)
+# 3. Compile to .qm (handled by the script if lrelease is found)
 ./scripts/update_translations.sh
 ```
 
-Idiomas incluidos: **inglés** (código fuente) más **español, francés, portugués,
-alemán, italiano, japonés, ruso y chino simplificado** (todos completos, 81/81
-cadenas, en `.ts` y `.qm`).
-
-En tiempo de ejecución se carga `furiusisomount_<locale>.qm` según el idioma del
-sistema (o `FURIUSISOMOUNT_LANG`), junto a las traducciones estándar de Qt
-(botones de los diálogos del sistema).
-
-## Correcciones respecto a la versión original
-
-- **`re` no estaba importado** pero se usaba al parsear la salida de `bchunk`
-  (error en tiempo de ejecución al convertir).
-- **Cálculo de checksum en el hilo principal** congelaba la interfaz: ahora corre en
-  un `QThread`, con barra de progreso real y botón de **cancelar**.
-- **Conversión BIN/CUE bloqueante** (leía la salida del proceso en el hilo GUI):
-  también movida a un hilo, con progreso real.
-- **Dispositivo loop hardcodeado** (`/dev/loop0`): ahora se detecta el que asigna
-  `udisksctl` y se registra su punto de montaje real.
-- **Comandos con `shell=True`** y comillas manuales: sustituidos por listas de
-  argumentos (sin problemas de espacios ni inyección de comandos).
-- **Salida de `bchunk` supuesta** (`base01.iso`): se descubre con `glob` y se limpian
-  pistas sobrantes.
-- **`fusermount3`** soportado (con retrocompatibilidad con `fusermount`).
-- **Selección del desplegable se perdía** al añadir elementos al historial; ahora se
-  preserva (y no emite señales espurias).
-- **Punto de montaje duplicado** si ya existía el directorio: ahora genera nombres
-  únicos y saneados.
-- **Ciclo de vida de los hilos** al cerrar la aplicación (apagado ordenado).
-- **Configuración (`settings.cfg`) sin usar**: ahora define la carpeta base de montaje.
-
-## Instalación (opcional)
-
-Con el paquete `.deb` todo se instala solo. Manualmente:
-
-```bash
-# Icono y acceso directo de escritorio
-sudo cp resources/icons/furiusisomount.png /usr/share/icons/hicolor/128x128/apps/
-sudo cp data/furiusisomount.desktop /usr/share/applications/
-sudo cp data/furiusisomount.metainfo.xml /usr/share/metainfo/
-# Traducciones compiladas
-sudo mkdir -p /usr/share/furiusisomount/translations
-sudo cp translations/*.qm /usr/share/furiusisomount/translations/
-```
-
-## Licencia
-
-GNU General Public License v3 (GPL v3).
+Included languages: **English** (source code) plus **Spanish, French, Portuguese,
+German, Italian, Japanese, Russian, and Simplified Chinese** (all complete, 81/81
+strings, in `.ts` and `.qm` formats). At runtime, `furiusisomount_<locale>.qm` is loaded based on the system language (or `FURIUSISOMOUNT_LANG`), along with the standard Qt translations (dialog buttons
