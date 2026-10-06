@@ -36,7 +36,22 @@ sudo dnf install python3-qt6 fuseiso bchunk udisks2 brasero lsof
 
 ```bash
 python3 main.py            # from the repository
-furiusisomount             # if installed (.deb package / pip)
+```
+
+![](images/furius-iso-mount-ezgif.com.gif)
+
+
+## Running from deb
+
+If you create the deb package and install it then alternative from the system Applications you can run with:
+
+```bash
+furiusisomount             # if installed (.deb package)
+```
+
+also to see the version from terminal:
+
+```bash
 furiusisomount --version   # program version
 ```
 
