@@ -42,7 +42,8 @@ jobs:
               id: io.github.wachin.furiusisomount
               name: FuriusIsoMount
               icon: resources/icons/furiusisomount.png
-              exec: usr/bin/furiusisomount
+              exec: usr/bin/python3
+              exec_args: usr/lib/python3.13/site-packages/furiusisomount/app.py
               version: __APP_VERSION__
             apt:
               arch: amd64
@@ -60,9 +61,6 @@ jobs:
             before_bundle:
               - pip3 install --no-build-isolation --target="usr/lib/python3.13/site-packages/" .
             after_bundle:
-              - mkdir -p usr/bin
-              - printf '#!/usr/bin/env python3\nimport sys\nsys.path.insert(0, "usr/lib/python3.13/site-packages")\nfrom furiusisomount.app import main\nsys.exit(main())\n' > usr/bin/furiusisomount
-              - chmod +x usr/bin/furiusisomount
               - mkdir -p usr/share/furiusisomount/translations
               - cp translations/furiusisomount_*.qm usr/share/furiusisomount/translations/ 2>/dev/null || true
               - mkdir -p usr/share/applications
