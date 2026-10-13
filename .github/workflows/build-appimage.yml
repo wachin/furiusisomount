@@ -18,7 +18,6 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          # Install Ubuntu keyring so appimage-builder's chroot can verify packages
           sudo apt-get install -y ubuntu-keyring
 
       - name: Install appimage-builder
