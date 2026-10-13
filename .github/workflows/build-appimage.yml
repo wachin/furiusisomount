@@ -60,6 +60,7 @@ jobs:
               allow_unauthenticated: true
             before_bundle:
               - pip3 install --no-build-isolation --target="usr/lib/python3.13/site-packages/" .
+            after_bundle:
               - mkdir -p usr/bin
               - printf '#!/usr/bin/env python3\nimport sys\nsys.path.insert(0, "usr/lib/python3.13/site-packages")\nfrom furiusisomount.app import main\nsys.exit(main())\n' > usr/bin/furiusisomount
               - chmod +x usr/bin/furiusisomount
