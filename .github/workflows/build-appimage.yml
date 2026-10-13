@@ -43,7 +43,6 @@ jobs:
               arch: amd64
               sources:
                 - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble main universe'
-                  key_url: 'https://ubuntu.com/static/opt/policies/Ubuntu-24.04-Component-Signing-GPG-Keyring.gpg'
               include:
                 - python3
                 - python3-pyqt6
@@ -53,6 +52,7 @@ jobs:
                 - bchunk
                 - libfuse2
                 - libglib2.0-0
+              allow_unauthenticated: true
             before_bundle:
               - pip3 install --no-build-isolation --target="usr/lib/python3.13/site-packages/" .
               - mkdir -p usr/bin
