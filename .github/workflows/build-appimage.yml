@@ -41,7 +41,7 @@ jobs:
             app_info:
               id: io.github.wachin.furiusisomount
               name: FuriusIsoMount
-              icon: resources/icons/furiusisomount.png
+              icon: usr/share/icons/hicolor/128x128/apps/furiusisomount.png
               exec: usr/bin/python3
               exec_args: usr/lib/python3.13/site-packages/furiusisomount/app.py
               version: __APP_VERSION__
