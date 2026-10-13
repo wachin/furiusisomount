@@ -27,8 +27,7 @@ jobs:
             libdbus-1-3 \
             libxcb-cursor0 \
             squashfs-tools \
-            patchelf \
-            desktop-file-utils
+            patchelf
 
       - name: Install appimage-builder
         run: |
@@ -40,6 +39,8 @@ jobs:
           echo "version=$(python3 -c 'import sys; sys.path.insert(0, "."); import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')" >> $GITHUB_OUTPUT
 
       - name: Create AppImage recipe
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
         run: |
           cat > appimage-builder.yml << 'RECIPE'
           version: 1
@@ -51,7 +52,7 @@ jobs:
               name: FuriusIsoMount
               icon: resources/icons/furiusisomount.png
               exec: usr/bin/furiusisomount
-              version: 0.11.3.1
+              version: __APP_VERSION__
             apt:
               arch: amd64
               sources:
@@ -66,7 +67,7 @@ jobs:
                 - bchunk
                 - libfuse2
                 - libglib2.0-0
-            script:
+            before_bundle:
               - pip3 install .
               - mkdir -p usr/share/furiusisomount/translations
               - cp translations/furiusisomount_*.qm usr/share/furiusisomount/translations/ 2>/dev/null || true
@@ -74,7 +75,7 @@ jobs:
               - cp data/furiusisomount.metainfo.xml usr/share/metainfo/
               - cp resources/icons/furiusisomount.png usr/share/icons/hicolor/128x128/apps/
           RECIPE
-          sed -i "s/version: 0.11.3.1/version: ${{ steps.version.outputs.version }}/" appimage-builder.yml
+          sed -i "s/__APP_VERSION__/${APP_VERSION}/" appimage-builder.yml
           cat appimage-builder.yml
 
       - name: Build AppImage
