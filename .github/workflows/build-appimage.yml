@@ -47,8 +47,8 @@ jobs:
           AppDir:
             path: ./FuriusIsoMount.AppDir
             app_info:
+              id: io.github.wachin.furiusisomount
               name: FuriusIsoMount
-              title: Furius ISO Mount
               icon: resources/icons/furiusisomount.png
               exec: usr/bin/furiusisomount
               version: 0.11.3.1
