@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build AppImage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout source
@@ -21,73 +21,65 @@ jobs:
           python-version: "3.13"
           cache: "pip"
 
-      - name: Install system dependencies
+      - name: Install appimage-builder
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libfuse2 \
-            libglib2.0-0 \
-            libgl1 \
-            libegl1 \
-            libxkbcommon0 \
-            libdbus-1-3 \
-            libxcb-cursor0
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install PyQt6
-
-      - name: Install package in user site
-        run: |
-          pip install --user .
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          wget -q "https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage" -O appimage-builder
+          chmod +x appimage-builder
+          sudo mv appimage-builder /usr/local/bin/appimage-builder
 
       - name: Get version
         id: version
         run: |
-          echo "version=$(python3 -c 'import furiusisomount; print(furiusisomount.__version__)')" >> $GITHUB_OUTPUT
+          VERSION=$(python3 -c "import sys; sys.path.insert(0, '.'); import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Download linuxdeploy
+      - name: Create AppImage recipe
         run: |
-          curl -L -o linuxdeploy-x86_64.AppImage \
-            https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          chmod +x linuxdeploy-x86_64.AppImage
+          VERSION="${{ steps.version.outputs.version }}"
+          cat > appimage-builder.yml << RECIPE
+          version: 1
 
-      - name: Download linuxdeploy-plugin-python
-        run: |
-          curl -L -o linuxdeploy-plugin-python-x86_64.AppImage \
-            https://github.com/nickiealeixo/linuxdeploy-plugin-python/releases/download/continuous/linuxdeploy-plugin-python-x86_64.AppImage
-          chmod +x linuxdeploy-plugin-python-x86_64.AppImage
+          AppDir:
+            path: ./FuriusIsoMount.AppDir
+            app_info:
+              name: FuriusIsoMount
+              title: Furius ISO Mount
+              icon: resources/icons/furiusisomount.png
+              exec: usr/bin/furiusisomount
+              version: ${VERSION}
+            apt:
+              arch: amd64
+              sources:
+                - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble main universe'
+              include:
+                - python3
+                - python3-pip
+                - python3-pyqt6
+                - python3-fuseiso
+                - fuseiso
+                - udisks2
+                - bchunk
+                - libfuse2
+                - libglib2.0-0
+            script:
+              - pip3 install .
+              - mkdir -p usr/share/furiusisomount/translations
+              - cp translations/furiusisomount_*.qm usr/share/furiusisomount/translations/ 2>/dev/null || true
+              - cp data/furiusisomount.desktop usr/share/applications/
+              - cp data/furiusisomount.metainfo.xml usr/share/metainfo/
+              - cp resources/icons/furiusisomount.png usr/share/icons/hicolor/128x128/apps/
+          RECIPE
+          cat appimage-builder.yml
 
-      - name: Create AppDir
+      - name: Build AppImage
         run: |
-          APPIMAGE_EXTRACT_AND_APP_DIR=1 \
-          ./linuxdeploy-plugin-python-x86_64.AppImage \
-            --python-version python3.13 \
-            --output app \
-            -- \
-            --appdir AppDir \
-            --executable "$HOME/.local/bin/furiusisomount" \
-            --desktop-file data/furiusisomount.desktop \
-            --icon-file resources/icons/furiusisomount.png
+          appimage-builder --recipe appimage-builder.yml
 
-      - name: Copy data files into AppDir
+      - name: Find and rename AppImage
         run: |
-          mkdir -p AppDir/usr/share/furiusisomount/translations
-          cp translations/*.qm AppDir/usr/share/furiusisomount/translations/ 2>/dev/null || true
-          mkdir -p AppDir/usr/share/applications
-          cp data/furiusisomount.desktop AppDir/usr/share/applications/
-          mkdir -p AppDir/usr/share/metainfo
-          cp data/furiusisomount.metainfo.xml AppDir/usr/share/metainfo/
-
-      - name: Package AppImage
-        run: |
-          ./linuxdeploy-x86_64.AppImage \
-            --appdir AppDir \
-            --output appimage \
-            --icon-file resources/icons/furiusisomount.png
-          mv FuriusIsoMount-x86_64.AppImage furiusisomount-${{ steps.version.outputs.version }}-x86_64.AppImage
+          VERSION="${{ steps.version.outputs.version }}"
+          find . -maxdepth 1 -name "FuriusIsoMount-x86_64.AppImage" -exec mv {} furiusisomount-${VERSION}-x86_64.AppImage \;
+          ls -la furiusisomount-*.AppImage
 
       - name: Compute checksum
         run: |
